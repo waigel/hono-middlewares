@@ -1,0 +1,15 @@
+pre-commit:
+  commands:
+    check:
+      run: pnpm biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      stage_fixed: true
+
+pre-push:
+  commands:
+    check:
+      run: pnpm biome check --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {push_files}
+
+commit-msg:
+  commands:
+    "lint commit message":
+      run: pnpm run commitlint --edit {1}

@@ -1,19 +1,53 @@
 {
-  "name": "hono-middlewares",
+  "name": "@hono-middlewares/monorepo",
+  "version": "0.0.0",
   "private": true,
+  "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "test": "turbo test",
+    "lint": "turbo format-and-lint:fix",
+    "lint:check": "turbo format-and-lint",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write",
+    "test-types": "turbo run test-types",
+    "postinstall": "lefthook install",
+    "commitlint": "commitlint --from=HEAD~1"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "turbo": "^2.0.14",
-    "typescript": "^5.4.5"
+    "@biomejs/biome": "1.8.3",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@tsconfig/strictest": "^2.0.5",
+    "@turbo/gen": "^2.0.11",
+    "@types/node": "^22.1.0",
+    "commitlint": "^19.3.0",
+    "lefthook": "^1.7.11",
+    "tsup": "^8.2.4",
+    "turbo": "^2.0.11",
+    "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@8.15.6",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
+  },
+  "volta": {
+    "node": "20.14.0"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "body-max-line-length": [
+        1,
+        "always",
+        100
+      ],
+      "references-empty": [
+        2,
+        "never"
+      ]
+    }
   }
 }

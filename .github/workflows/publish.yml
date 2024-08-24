@@ -1,0 +1,46 @@
+name: Publish
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*v*'
+
+jobs:
+  npm-publish:
+    name: Publish npm packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+        
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+        
+      - name: Install dependencies
+        run: pnpm install
+  
+      - name: Build
+        run: pnpm build
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN_RELEASE}}
+        run: |
+          pnpm config set '//registry.npmjs.org/:_authToken' $NODE_AUTH_TOKEN
+          pnpm publish ${GITHUB_REF_NAME%-v*} --no-git-checks --provenance --access public --filter=jwks
