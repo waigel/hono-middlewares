@@ -13,3 +13,6 @@ const app = new Hono();
 app.use("*", jwks({ domain: "https://example.com"}));
 ```
 
+---
+
+Licensed under the MIT License.
