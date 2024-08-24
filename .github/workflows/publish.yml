@@ -1,7 +1,6 @@
 name: Publish
 
 permissions:
-  id-token: write
   contents: read
 
 on:
@@ -15,7 +14,9 @@ jobs:
     name: Publish npm packages
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Check out code
         uses: actions/checkout@v4
