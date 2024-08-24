@@ -4,7 +4,7 @@
     "release-type": "node",
     "separate-pull-requests": true,
     "packages": {
-        "./packages/jwks": {
+        "packages/jwks": {
             "package-name": "@hono-middlewares/jwks"
         }
     }
