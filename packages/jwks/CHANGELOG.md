@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.1](https://github.com/waigel/hono-middlewares/compare/jwks-v1.0.0...jwks@v1.0.1) (2024-08-24)
+
+
+### Features
+
+* **jwks:** add license not to README.md ([#1](https://github.com/waigel/hono-middlewares/issues/1)) ([3b32643](https://github.com/waigel/hono-middlewares/commit/3b326430e6d858bed55e0c3ea6529a2b4ec75cb9))
+
+
+### Bug Fixes
+
+* release-please bot ([#1](https://github.com/waigel/hono-middlewares/issues/1)) ([a61c783](https://github.com/waigel/hono-middlewares/commit/a61c783fe050fb1a0796c84d9f362113315cc488))
+
+
+### Miscellaneous Chores
+
+* release 1.0.1 ([8faf271](https://github.com/waigel/hono-middlewares/commit/8faf271a61f4fe38e826d5454a4f39811351c3b7))
+
 ## 1.0.0 (2024-08-24)
 
 
