@@ -1,0 +1,11 @@
+{
+    "include-component-in-tag": true,
+    "tag-separator": "@",
+    "release-type": "node",
+    "separate-pull-requests": true,
+    "packages": {
+        "./packages/jwks": {
+            "package-name": "@hono-middlewares/jwks"
+        }
+    }
+}
