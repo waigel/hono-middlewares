@@ -3,7 +3,7 @@ This package provides a middleware for Hono to validate JWT tokens using a JWKS 
 
 ## Installation
 ```bash
-pnpm add @hono-middlewares/jwks
+npm i @hono-middlewares/jwks
 ```
 
 ## Usage
