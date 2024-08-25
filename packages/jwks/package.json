@@ -1,6 +1,6 @@
 {
     "name": "@hono-middlewares/jwks",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "license": "MIT",
     "description": "Middleware for Hono to validate JWTs using JWKS",
     "repository": {

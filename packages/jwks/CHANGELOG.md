@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/waigel/hono-middlewares/compare/jwks@v1.0.1...jwks@v1.0.2) (2024-08-25)
+
+
+### Bug Fixes
+
+* use npm command in readme.md ([#1](https://github.com/waigel/hono-middlewares/issues/1)) ([5ac7699](https://github.com/waigel/hono-middlewares/commit/5ac7699ebc40f7e1504a177ea5ccd0d3c91271ae))
+
 ## [1.0.1](https://github.com/waigel/hono-middlewares/compare/jwks-v1.0.0...jwks@v1.0.1) (2024-08-24)
 
 
