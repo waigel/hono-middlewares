@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/waigel/hono-middlewares/compare/jwks@v1.0.2...jwks@v1.0.3) (2024-08-27)
+
+
+### Bug Fixes
+
+* use native jwt validate functions to avoide node:crypto ([#9](https://github.com/waigel/hono-middlewares/issues/9)) ([966a99a](https://github.com/waigel/hono-middlewares/commit/966a99a92b2c68fd388cc21acd10a8d285b510f6))
+
 ## [1.0.2](https://github.com/waigel/hono-middlewares/compare/jwks@v1.0.1...jwks@v1.0.2) (2024-08-25)
 
 
