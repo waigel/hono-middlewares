@@ -23,11 +23,9 @@
         "dev": "tsup --watch",
         "build": "tsup",
         "prepack": "tsup --clean",
-        "test": "vitest",
-        "test-types": "attw -P"
+        "test": "vitest"
     },
     "dependencies": {
-        "fast-jwt": "^4.0.2",
         "get-jwks": "^9.0.2"
     },
     "peerDependencies": {

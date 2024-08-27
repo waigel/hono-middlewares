@@ -1,15 +1,10 @@
-import { createVerifier } from "fast-jwt";
 import buildGetJwks, { type GetJwksOptions } from "get-jwks";
 import type { Context, MiddlewareHandler } from "hono";
 import { getCookie, getSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { CookiePrefixOptions } from "hono/utils/cookie";
-import {
-	JwtTokenExpired,
-	JwtTokenInvalid,
-	JwtTokenSignatureMismatched,
-} from "hono/utils/jwt/types";
+import { Jwt } from "hono/utils/jwt";
 
 interface JwksOptions extends GetJwksOptions {
 	/** Max items to hold in cache. Defaults to 100. */
@@ -77,48 +72,36 @@ export function createJWKSMiddleware<T extends JWTPayload>(
 	return createMiddleware(async (ctx, next) => {
 		const token = await getAuthorizationToken(options, ctx);
 
-		const verifyWithPromise = createVerifier({
-			// biome-ignore lint/suspicious/noExplicitAny: any is required by fast-jwt
-			key: async ({ header }: any) => {
-				const publicKey = await getJwks.getPublicKey({
-					kid: header?.kid,
-					alg: header?.alg,
-					domain,
-				});
-				return publicKey;
-			},
-		});
-
+		let payload: T | undefined;
+		let cause: unknown;
 		try {
-			const payload = await verifyWithPromise(token)
-				.catch((e) => {
-					switch (e.code) {
-						case "FAST_JWT_INVALID_TYPE":
-							throw new JwtTokenInvalid(token);
-						case "FAST_JWT_EXPIRED":
-							throw new JwtTokenExpired(token);
-						case "FAST_JWT_INVALID_SIGNATURE":
-							throw new JwtTokenSignatureMismatched(token);
-						case "FAST_JWT_MALFORMED":
-							throw new JwtTokenInvalid(token);
-						default:
-							throw e;
-					}
-				})
-				.then((payload) => payload as T);
-			ctx.set("jwtPayload", payload);
+			const { header } = Jwt.decode(token);
+			const publicKey = await getJwks.getPublicKey({
+				// biome-ignore lint/suspicious/noExplicitAny: The header is not typed in the jwt library
+				kid: (header as any)?.kid,
+				alg: header?.alg,
+				domain,
+			});
+
+			payload = (await Jwt.verify(token, publicKey, header?.alg)) as T;
 		} catch (e) {
+			cause = e;
+		}
+		if (!payload) {
 			throw new HTTPException(401, {
 				message: "Unauthorized",
-				cause: e,
 				res: unauthorizedResponse({
 					ctx,
 					error: "invalid_token",
 					statusText: "Unauthorized",
 					errDescription: "token verification failure",
 				}),
+				cause,
 			});
 		}
+
+		ctx.set("jwtPayload", payload);
+
 		await next();
 	});
 }
