@@ -1,0 +1,51 @@
+{
+    "name": "@hono-middlewares/permify",
+    "version": "1.0.0",
+    "license": "MIT",
+    "description": "Middleware for Hono to verify permissions using Permify",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/waigel/hono-middlewares",
+        "directory": "packages/permify"
+    },
+    "type": "module",
+    "main": "dist/index.js",
+    "module": "./dist/index.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "tsup --watch",
+        "build": "tsup",
+        "prepack": "tsup --clean",
+        "test": "vitest",
+        "attw": "attw"
+    },
+    "dependencies": {
+        "@buf/permifyco_permify.bufbuild_es": "2.0.0-20240722150440-5ee7aa4c5fb5.2",
+        "@bufbuild/protobuf": "^2.0.0",
+        "@permify/permify-node": "^0.4.9"
+    },
+    "peerDependencies": {
+        "hono": "^4.5.8"
+    },
+    "engines": {
+        "node": ">= 16"
+    },
+    "keywords": [
+        "hono",
+        "permissions",
+        "permify",
+        "auth",
+        "middleware"
+    ],
+    "devDependencies": {
+        "@arethetypeswrong/cli": "^0.15.4",
+        "vitest": "^2.0.5"
+    }
+}

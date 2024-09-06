@@ -13,7 +13,8 @@
     "format-and-lint:fix": "biome check . --write",
     "test-types": "turbo run test-types",
     "postinstall": "lefthook install",
-    "commitlint": "commitlint --from=HEAD~1"
+    "commitlint": "commitlint --from=HEAD~1",
+    "attw": "turbo run attw"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",

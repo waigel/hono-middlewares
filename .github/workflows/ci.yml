@@ -45,3 +45,6 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Test (are the types wrong)
+        run: pnpm attw
