@@ -20,6 +20,8 @@ const { checkPermission } = createCheckPermissionMiddleware({
 });
 
 // Set the subject id for permify validation
+// If you using the @hono-middlewares/jwks middleware, you can skip this step
+// because the middleware will set the subject id automatically
 app.use("*", createMiddleware(async (c, next) => {
     c.set("sub", "acct_01j6wwsyzteqqbe76dt28vdfdr");
     await next();

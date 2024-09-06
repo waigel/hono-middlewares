@@ -8,6 +8,7 @@ type Env = {
 	Variables: {
 		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 		jwtPayload: any;
+		sub?: string;
 	};
 };
 
@@ -55,6 +56,10 @@ describe("JWKS", () => {
 		const app = new Hono<Env>();
 
 		app.use("/auth/*", jwks({ domain: jwksUrl }));
+		app.use(
+			"/auth-sub/*",
+			jwks({ domain: jwksUrl, subjectToSubContextVariable: "message" }),
+		);
 		app.use("/auth-unicode/*", jwks({ domain: jwksUrl }));
 		app.use("/nested/*", async (c, next) => {
 			const auth = jwks({ domain: jwksUrl });
@@ -65,6 +70,11 @@ describe("JWKS", () => {
 			handlerExecuted = true;
 			const payload = c.get("jwtPayload");
 			return c.json(payload);
+		});
+		app.get("/auth-sub/*", (c) => {
+			handlerExecuted = true;
+			const sub = c.get("sub");
+			return c.json({ sub });
 		});
 		app.get("/auth-unicode/*", (c) => {
 			handlerExecuted = true;
@@ -95,6 +105,20 @@ describe("JWKS", () => {
 			expect(res).not.toBeNull();
 			expect(res.status).toBe(200);
 			expect(await res.json()).toEqual({ message: "hello world" });
+			expect(handlerExecuted).toBeTruthy();
+		});
+
+		it("should set the 'sub' context variable", async () => {
+			const credential =
+				"eyJhbGciOiJSUzI1NiIsImtpZCI6IjIzZmY2ODNjZDIzNGE5MTdmYTcyNWIifQ.eyJtZXNzYWdlIjoiaGVsbG8gd29ybGQifQ.RSfeJmhhbv0DONbwml-V0TwHLjKHaaON3-keyjacD1-RlvGiXpK2uerkrtgz-on4qLPJlh6c1qe6VCnatYlGeFQ3QQJIqXM-Q2ZNS0kNHz4oeJWdzvPRTM-gUmMb3rmw2EK7TlBAg2mVRCfqNW9jdwnfbd56JmfwTT7rYCVQKzZbgUNLFfB0lHtA86AUWZmpc-es3l-b1mxYLsdQroGS1cpCUsRe7et2nCmJSu3qJybKvYC4gDd8mmMEii-Fej69Esxl4UWgcEwD2cqViyvpClKtrhcgA5Nf0a624NUBVcS-7nHZNX1TJPTbnx6LQThBx7A7GU1b_XB0ig0wZ8Zpew";
+			const req = new Request("http://localhost/auth-sub/a");
+			req.headers.set("Authorization", `Bearer ${credential}`);
+			const res = await app.request(req);
+			expect(res).not.toBeNull();
+			expect(res.status).toBe(200);
+			expect(await res.json()).toEqual({
+				sub: "hello world",
+			});
 			expect(handlerExecuted).toBeTruthy();
 		});
 
