@@ -1,6 +1,6 @@
 {
     "name": "@hono-middlewares/permify",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "license": "MIT",
     "description": "Middleware for Hono to verify permissions using Permify",
     "repository": {
