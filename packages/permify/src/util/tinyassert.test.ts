@@ -22,8 +22,8 @@ describe(tinyassert, () => {
 				.replaceAll(process.cwd(), "__CWD__");
 			expect(stack).toMatchInlineSnapshot(`
         "Error: TinyAssertionError
-            at boom (__CWD__/src/util/tinyassert.test.ts:9:7)
-            at __CWD__/src/util/tinyassert.test.ts:12:7"
+            at boom (__CWD__/src/util/tinyassert.test.ts:9:4)
+            at __CWD__/src/util/tinyassert.test.ts:12:4"
       `);
 		}
 	});
