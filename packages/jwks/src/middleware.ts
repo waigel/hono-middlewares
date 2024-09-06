@@ -38,6 +38,13 @@ interface MiddlewareOptions {
 				secret?: string | BufferSource;
 				prefixOptions?: CookiePrefixOptions;
 		  };
+	/**
+	 * Set the JWT subject claim to a context variable.
+	 *
+	 * ctx.set("sub", payload.claim.subjectToContextVariable);
+	 * @default "sub" - The subject claim is set to the "sub" context variable.
+	 */
+	subjectToSubContextVariable?: string;
 }
 
 /**
@@ -57,12 +64,20 @@ export type JWTPayload = {
 	 * The token is checked to ensure it is not issued in the future.
 	 */
 	iat?: number;
+	/**
+	 * The subject of the token. This is usually the identifier of the user the token represents.
+	 */
+	sub?: string;
 };
 
 export function createJWKSMiddleware<T extends JWTPayload>(
 	options: MiddlewareOptions,
 ): MiddlewareHandler {
-	const { domain, getJwksOptions } = options;
+	const {
+		domain,
+		getJwksOptions,
+		subjectToSubContextVariable = "sub",
+	} = options;
 
 	const getJwks = buildGetJwks({
 		...getJwksOptions,
@@ -101,6 +116,9 @@ export function createJWKSMiddleware<T extends JWTPayload>(
 		}
 
 		ctx.set("jwtPayload", payload);
+		if (subjectToSubContextVariable && subjectToSubContextVariable in payload) {
+			ctx.set("sub", payload[subjectToSubContextVariable]);
+		}
 
 		await next();
 	});
