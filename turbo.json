@@ -5,15 +5,6 @@
     "//#format-and-lint:fix": {
       "cache": false
     },
-    "attw": {
-      "dependsOn": [
-        "^build"
-      ],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".env*"
-      ]
-    },
     "test": {
       "dependsOn": [
         "^build",
