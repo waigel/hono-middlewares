@@ -6,6 +6,9 @@
     "packages": {
         "packages/jwks": {
             "package-name": "@hono-middlewares/jwks"
+        },
+        "packages/permify": {
+            "package-name": "@hono-middlewares/permify"
         }
     }
 }
