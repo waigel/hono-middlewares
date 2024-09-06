@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/waigel/hono-middlewares/compare/permify@v1.0.1...permify@v1.1.0) (2024-09-06)
+
+
+### Features
+
+* set the subject as sub context variable ([#17](https://github.com/waigel/hono-middlewares/issues/17)) ([13adbc2](https://github.com/waigel/hono-middlewares/commit/13adbc215228fcdc8f9654474cce49d36b2f2886))
+
 ## 1.0.1 (2024-09-06)
 
 
