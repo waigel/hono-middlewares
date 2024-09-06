@@ -1,4 +1,5 @@
 {
   ".": "1.0.0",
-  "packages/jwks": "1.0.3"
+  "packages/jwks": "1.0.3",
+  "packages/permify": "1.0.1"
 }
