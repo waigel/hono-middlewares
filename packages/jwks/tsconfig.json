@@ -2,13 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "include": [
     "src",
-    "vitest.config.ts",
     "tsup.config.ts"
   ],
   "compilerOptions": {
     "types": [
       "@types/node",
-      "vitest/globals"
+      "vitest/globals",
+      "@cloudflare/workers-types/experimental"
     ],
     "jsx": "react-jsx"
   }

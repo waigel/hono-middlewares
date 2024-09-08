@@ -1,10 +1,21 @@
-import buildGetJwks, { type GetJwksOptions } from "get-jwks";
+import buildGetJwks, {
+	type GetJwks,
+	type GetJwksOptions,
+	type GetPublicKeyOptions,
+} from "@waigel/get-jwks";
 import type { Context, MiddlewareHandler } from "hono";
+import { getRuntimeKey } from "hono/adapter";
 import { getCookie, getSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { CookiePrefixOptions } from "hono/utils/cookie";
 import { Jwt } from "hono/utils/jwt";
+
+type Variables = {
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	jwtPayload: any;
+	sub: string | undefined | never | unknown;
+};
 
 interface JwksOptions extends GetJwksOptions {
 	/** Max items to hold in cache. Defaults to 100. */
@@ -24,8 +35,6 @@ interface JwksOptions extends GetJwksOptions {
 	providerDiscovery: GetJwksOptions["providerDiscovery"];
 	/** Specify a relative path to the jwks_uri. Example /otherdir/jwks.json. Takes precedence over providerDiscovery. Optional. */
 	jwksPath: GetJwksOptions["jwksPath"];
-	/** The custom agent to use for requests, as specified in node-fetch documentation. Defaults to null */
-	agent: GetJwksOptions["agent"];
 }
 
 interface MiddlewareOptions {
@@ -38,6 +47,10 @@ interface MiddlewareOptions {
 				secret?: string | BufferSource;
 				prefixOptions?: CookiePrefixOptions;
 		  };
+
+	kvNamespace?: string;
+	expirationTtl?: number;
+
 	/**
 	 * Set the JWT subject claim to a context variable.
 	 *
@@ -77,6 +90,7 @@ export function createJWKSMiddleware<T extends JWTPayload>(
 		domain,
 		getJwksOptions,
 		subjectToSubContextVariable = "sub",
+		expirationTtl = 60,
 	} = options;
 
 	const getJwks = buildGetJwks({
@@ -84,19 +98,28 @@ export function createJWKSMiddleware<T extends JWTPayload>(
 		issuersWhitelist: [...(getJwksOptions?.issuersWhitelist ?? []), domain],
 	});
 
-	return createMiddleware(async (ctx, next) => {
+	return createMiddleware<{ Variables: Variables }>(async (ctx, next) => {
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		const kvNamespace = (ctx.env as any)?.[
+			options.kvNamespace ?? "JWKS_CACHE_NAMESPACE"
+		] as KVNamespace | undefined;
 		const token = await getAuthorizationToken(options, ctx);
 
 		let payload: T | undefined;
 		let cause: unknown;
 		try {
 			const { header } = Jwt.decode(token);
-			const publicKey = await getJwks.getPublicKey({
-				// biome-ignore lint/suspicious/noExplicitAny: The header is not typed in the jwt library
-				kid: (header as any)?.kid,
-				alg: header?.alg,
-				domain,
-			});
+			const publicKey = await getPublicKey(
+				getJwks,
+				{
+					// biome-ignore lint/suspicious/noExplicitAny: The header is not typed in the jwt library
+					kid: (header as any)?.kid,
+					alg: header?.alg,
+					domain,
+				},
+				kvNamespace,
+				expirationTtl,
+			);
 
 			payload = (await Jwt.verify(token, publicKey, header?.alg)) as T;
 		} catch (e) {
@@ -119,9 +142,41 @@ export function createJWKSMiddleware<T extends JWTPayload>(
 		if (subjectToSubContextVariable && subjectToSubContextVariable in payload) {
 			ctx.set("sub", payload[subjectToSubContextVariable]);
 		}
-
 		await next();
 	});
+}
+
+async function getPublicKey(
+	getJwks: GetJwks,
+	options: GetPublicKeyOptions,
+	kvNamespace: KVNamespace | undefined,
+	expirationTtl: number,
+) {
+	if (getRuntimeKey() === "workerd") {
+		if (kvNamespace === undefined) {
+			return await getJwks.getPublicKey(options);
+		}
+		// Check if the key is in the cache
+
+		// Build the cache key with the domain, alg and kid (skip empty values)
+		const cacheKey = Object.entries(options)
+			.filter(([, value]) => value)
+			.map(([key, value]) => `${key}:${value}`)
+			.join("-");
+
+		// Check if the key is in the cache
+		const cachedJWKS = await kvNamespace.get(cacheKey, {
+			type: "text",
+		});
+
+		if (cachedJWKS) {
+			return cachedJWKS;
+		}
+		const publicKey = await getJwks.getPublicKey(options);
+		await kvNamespace.put(cacheKey, publicKey, { expirationTtl });
+		return publicKey;
+	}
+	return await getJwks.getPublicKey(options);
 }
 
 /**
