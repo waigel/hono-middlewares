@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
-import { jwks } from ".";
+import { jwks } from "./index";
 
 type Env = {
 	Variables: {
