@@ -92,8 +92,6 @@ export function createCheckPermissionMiddleware(options: MiddlewareOptions): {
 		throwOnPermissionDenied = true,
 	} = options;
 
-	const client = permify.grpc.newClient(options.client);
-
 	return {
 		checkPermission: ({
 			entity,
@@ -103,6 +101,9 @@ export function createCheckPermissionMiddleware(options: MiddlewareOptions): {
 				tinyassert(entity, "entity is required");
 				tinyassert(entity.id, "entity.id is required");
 				tinyassert(entity.type, "entity.type is required");
+
+				const client = permify.grpc.newClient(options.client);
+
 				// Get the tenant ID from the context variable or use the default tenant ID
 				const requestTenantId =
 					tenantIdContextVariable && ctx.get(tenantIdContextVariable)
